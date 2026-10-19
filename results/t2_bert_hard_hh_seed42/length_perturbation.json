@@ -1,0 +1,26 @@
+{
+  "compress_chosen": {
+    "accuracy": 0.68,
+    "accuracy_sym": 0.706
+  },
+  "equal_compress": {
+    "p_prefers_longer": 0.662,
+    "mean_p_longer": 0.5260225534439087,
+    "p_prefers_longer_sym": 0.734
+  },
+  "equal_pad": {
+    "p_prefers_longer": 0.408,
+    "mean_p_longer": 0.49309414625167847,
+    "p_prefers_longer_sym": 0.292
+  },
+  "orig": {
+    "accuracy": 0.752,
+    "accuracy_sym": 0.738
+  },
+  "pad_rejected": {
+    "accuracy": 0.726,
+    "accuracy_sym": 0.768
+  },
+  "compress_drop": 0.07199999999999995,
+  "pad_drop": 0.026000000000000023
+}

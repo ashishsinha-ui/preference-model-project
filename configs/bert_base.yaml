@@ -1,0 +1,22 @@
+# T2 — BERT-base-uncased cross-encoder
+tier: t2
+short_name: bert
+model_name: bert-base-uncased
+dataset: hh              # hh | shp
+label_type: hard         # hard | soft
+subset_size: null        # e.g. 20000 for the dev run
+swap_prob: 0.0           # 0.5 = A/B swap augmentation
+max_prompt: 128          # 0 = response-only ablation
+epochs: 3
+batch_size: 32
+grad_accum: 1
+eval_batch_size: 128
+lr: 2.0e-5
+weight_decay: 0.01
+warmup_ratio: 0.1
+dropout: 0.1
+eval_every: 1000         # optimizer steps between validation checks
+patience: 3              # validation checks without improvement before stopping
+bf16: true
+gradient_checkpointing: false
+seed: 42

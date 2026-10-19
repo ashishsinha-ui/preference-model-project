@@ -1,0 +1,22 @@
+# T3 — DeBERTa-v3-base cross-encoder (~184M params)
+tier: t3
+short_name: deberta
+model_name: microsoft/deberta-v3-base
+dataset: hh
+label_type: hard
+subset_size: null
+swap_prob: 0.0
+max_prompt: 128
+epochs: 3
+batch_size: 16            # fp32 needs smaller batches; effective batch = 16 x 2 = 32
+grad_accum: 2
+eval_batch_size: 32
+lr: 2.0e-5
+weight_decay: 0.01
+warmup_ratio: 0.1
+dropout: 0.1
+eval_every: 1000
+patience: 3
+bf16: false   # DeBERTa-v3 disentangled attention produces NaN under bf16 autocast; BERT is unaffected
+gradient_checkpointing: false
+seed: 42

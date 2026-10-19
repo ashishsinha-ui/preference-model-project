@@ -1,0 +1,11 @@
+data/
+checkpoints/
+logs/
+.hf_cache/
+mlflow.db
+mlruns/
+__pycache__/
+*.pyc
+results/**/preds_*.parquet
+.venv/
+*.out

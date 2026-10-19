@@ -1,0 +1,23 @@
+# T4 — DeBERTa-v3-large cross-encoder (~435M params). Fits in 48 GB without checkpointing;
+# if you hit OOM, set gradient_checkpointing: true or batch_size: 8 with grad_accum: 4.
+tier: t4
+short_name: deberta-large
+model_name: microsoft/deberta-v3-large
+dataset: hh
+label_type: hard
+subset_size: null
+swap_prob: 0.0
+max_prompt: 128
+epochs: 2
+batch_size: 8             # fp32: effective batch = 8 x 4 = 32
+grad_accum: 4
+eval_batch_size: 16
+lr: 1.0e-5
+weight_decay: 0.01
+warmup_ratio: 0.1
+dropout: 0.1
+eval_every: 1000
+patience: 3
+bf16: false   # DeBERTa-v3 disentangled attention produces NaN under bf16 autocast; BERT is unaffected
+gradient_checkpointing: true
+seed: 42

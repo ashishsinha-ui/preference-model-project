@@ -1,0 +1,162 @@
+{
+  "hh_val": {
+    "accuracy": 0.5557778889444722,
+    "auc": 0.6006774050381583,
+    "brier": 0.24138821823215892,
+    "nll": 0.6756464228506183,
+    "ece": 0.03559048988623709,
+    "accuracy_ci95": [
+      0.5435967983991996,
+      0.5684550608637652
+    ],
+    "swap_consistency": 0.9818242454560614,
+    "position_bias": -5.4798401749048914e-18,
+    "accuracy_symmetrized": 0.5557778889444722,
+    "length_r_model": 0.8082486323200708,
+    "length_rho_model": 0.9308629027993399,
+    "length_r_human": 0.1362305092234103,
+    "length_bias_excess": 0.6720181230966605,
+    "per_domain_accuracy": {
+      "helpful-base": 0.5917820455560518,
+      "helpful-online": 0.44811753902662993,
+      "helpful-rejection-sampled": 0.5695016860247284
+    },
+    "n": 5997
+  },
+  "hh_test": {
+    "accuracy": 0.5556990636099451,
+    "auc": 0.5900722818706226,
+    "brier": 0.24316302885727875,
+    "nll": 0.6792890335877217,
+    "ece": 0.019830600027289383,
+    "accuracy_ci95": [
+      0.5429447852760736,
+      0.5682918953826284
+    ],
+    "swap_consistency": 0.9806264126574104,
+    "position_bias": -5.717809894340086e-18,
+    "accuracy_symmetrized": 0.5556990636099451,
+    "length_r_model": 0.7821128779991944,
+    "length_rho_model": 0.9265437192101433,
+    "length_r_human": 0.10945685862791993,
+    "length_bias_excess": 0.6726560193712745,
+    "per_domain_accuracy": {
+      "helpful-base": 0.5993179880647911,
+      "helpful-online": 0.4363957597173145,
+      "helpful-rejection-sampled": 0.5677466863033873
+    },
+    "n": 6194
+  },
+  "hh_harmless": {
+    "accuracy": 0.4223434460864316,
+    "auc": 0.3822143025232094,
+    "brier": 0.2777228028783606,
+    "nll": 0.7509612054616134,
+    "ece": 0.1506976661582607,
+    "accuracy_ci95": [
+      0.4176479465223904,
+      0.42692716134946007
+    ],
+    "swap_consistency": 0.9800800375595251,
+    "position_bias": -4.8425967963595885e-18,
+    "accuracy_symmetrized": 0.4223434460864316,
+    "length_r_model": 0.8118909232592794,
+    "length_rho_model": 0.9426301314731841,
+    "length_r_human": -0.20443791706422207,
+    "length_bias_excess": 1.0163288403235013,
+    "per_domain_accuracy": {
+      "harmless-base": 0.4223434460864316
+    },
+    "n": 44729
+  },
+  "shp_val": {
+    "accuracy": 0.639001898562517,
+    "auc": 0.6849015808325196,
+    "brier": 0.22592057810337507,
+    "nll": 0.6431593024835751,
+    "ece": 0.04368598307794655,
+    "accuracy_ci95": [
+      0.6318416056414429,
+      0.6461635475996745
+    ],
+    "swap_consistency": 0.9917005695687551,
+    "position_bias": -5.871806070027272e-18,
+    "accuracy_symmetrized": 0.639001898562517,
+    "length_r_model": 0.7078179871011258,
+    "length_rho_model": 0.9327244949866769,
+    "length_r_human": 0.2742397351641066,
+    "length_bias_excess": 0.43357825193701915,
+    "kl_to_human": 0.11945316046643176,
+    "js_to_human": 0.031812829696052154,
+    "brier_soft": 0.05274803561329071,
+    "ece_high_disagreement": 0.02151680338041791,
+    "kl_high_disagreement": 0.028153032480305033,
+    "mean_abs_dev_high_disagreement": 0.09042372757450688,
+    "per_domain_accuracy": {
+      "askacademia": 0.6329355608591886,
+      "askanthropology": 0.7093596059113301,
+      "askbaking": 0.5947494033412888,
+      "askcarguys": 0.7169811320754716,
+      "askculinary": 0.6088825214899714,
+      "askdocs": 0.5904761904761905,
+      "askengineers": 0.6185795814838301,
+      "askhistorians": 0.6194690265486725,
+      "askhr": 0.6271450858034321,
+      "askphilosophy": 0.6101973684210527,
+      "askphysics": 0.684596577017115,
+      "askscience": 0.6351501668520578,
+      "asksciencefiction": 0.7189086294416244,
+      "asksocialscience": 0.6802721088435374,
+      "askvet": 0.6411764705882353,
+      "changemyview": 0.6860109957238851,
+      "explainlikeimfive": 0.6814595660749507,
+      "legaladvice": 0.6220614828209765
+    },
+    "n": 18435
+  },
+  "shp_test": {
+    "accuracy": 0.626426165380854,
+    "auc": 0.6789511884141888,
+    "brier": 0.22720892057179637,
+    "nll": 0.6458919824114685,
+    "ece": 0.03671645422359716,
+    "accuracy_ci95": [
+      0.6195805715527546,
+      0.6330557970227101
+    ],
+    "swap_consistency": 0.9910355318917744,
+    "position_bias": -5.6880382061367085e-18,
+    "accuracy_symmetrized": 0.626426165380854,
+    "length_r_model": 0.708088924232456,
+    "length_rho_model": 0.9330715900937875,
+    "length_r_human": 0.25257584514286613,
+    "length_bias_excess": 0.4555130790895898,
+    "kl_to_human": 0.12166458817367475,
+    "js_to_human": 0.03241256914559763,
+    "brier_soft": 0.05372030427219126,
+    "ece_high_disagreement": 0.009588603668248128,
+    "kl_high_disagreement": 0.028773097917455713,
+    "mean_abs_dev_high_disagreement": 0.09124498708540538,
+    "per_domain_accuracy": {
+      "askacademia": 0.6135831381733021,
+      "askanthropology": 0.6977611940298507,
+      "askbaking": 0.5599481529488011,
+      "askcarguys": 0.5384615384615384,
+      "askculinary": 0.6164650799843933,
+      "askdocs": 0.545054945054945,
+      "askengineers": 0.5989385898407885,
+      "askhistorians": 0.7926829268292683,
+      "askhr": 0.6379746835443038,
+      "askphilosophy": 0.5997045790251108,
+      "askphysics": 0.5638841567291312,
+      "askscience": 0.617195496417605,
+      "asksciencefiction": 0.7096124811273277,
+      "asksocialscience": 0.5957446808510638,
+      "askvet": 0.6160714285714286,
+      "changemyview": 0.670479302832244,
+      "explainlikeimfive": 0.6579439252336449,
+      "legaladvice": 0.6372646184340932
+    },
+    "n": 18406
+  }
+}
