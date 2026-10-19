@@ -19,7 +19,7 @@ import torch
 from sklearn.metrics import roc_auc_score
 from torch.utils.data import DataLoader
 
-from src.data.dataset import CrossCollator, PairDataset, load_split
+from src.data.dataset import PairDataset, load_split
 from src.evaluation.evaluate import EVAL_SETS, evaluate_set, swap
 from src.models.cross_encoder import load_checkpoint
 from src.training.trainer import to_device
@@ -63,7 +63,7 @@ def main():
     args = ap.parse_args()
 
     model, tok, cfg = load_checkpoint(f"checkpoints/{args.run}")
-    collate = CrossCollator(tok, token_type=model.use_token_type)
+    collate = model.make_collator(tok)
     name = mc_run_name(args.run)
     out_dir = Path("results") / name
     out_dir.mkdir(parents=True, exist_ok=True)

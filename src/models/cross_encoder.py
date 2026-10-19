@@ -10,6 +10,8 @@ import torch.nn as nn
 import yaml
 from transformers import AutoConfig, AutoModel, AutoTokenizer
 
+from src.data.dataset import CrossCollator
+
 
 class CrossEncoderModel(nn.Module):
     def __init__(self, model_name, dropout=0.1, gradient_checkpointing=False, pretrained=True):
@@ -32,6 +34,9 @@ class CrossEncoderModel(nn.Module):
         cls = self.encoder(**kwargs).last_hidden_state[:, 0]
         return self.head(self.drop(cls)).squeeze(-1)
 
+    def make_collator(self, tokenizer):
+        return CrossCollator(tokenizer, token_type=self.use_token_type)
+
     def param_groups(self, weight_decay):
         """No weight decay on biases and LayerNorm weights."""
         decay, no_decay = [], []
@@ -41,10 +46,21 @@ class CrossEncoderModel(nn.Module):
                 {"params": no_decay, "weight_decay": 0.0}]
 
 
+def build_model(cfg, pretrained=True):
+    """arch: cross (default, T2-T4) or bi (T5 bi-encoder)."""
+    if cfg.get("arch", "cross") == "bi":
+        from src.models.bi_encoder import BiEncoderModel
+        model_cls = BiEncoderModel
+    else:
+        model_cls = CrossEncoderModel
+    return model_cls(cfg["model_name"], cfg["dropout"],
+                     cfg.get("gradient_checkpointing", False) and pretrained, pretrained)
+
+
 def load_checkpoint(run_dir, device="cuda"):
-    """Rebuild a trained cross-encoder from checkpoints/<run_name>/ (config.yaml + model.pt)."""
+    """Rebuild a trained model from checkpoints/<run_name>/ (config.yaml + model.pt)."""
     run_dir = Path(run_dir)
     cfg = yaml.safe_load(open(run_dir / "config.yaml"))
-    model = CrossEncoderModel(cfg["model_name"], cfg["dropout"], pretrained=False)
+    model = build_model(cfg, pretrained=False)
     model.load_state_dict(torch.load(run_dir / "model.pt", map_location="cpu"))
     return model.to(device).eval(), AutoTokenizer.from_pretrained(cfg["model_name"]), cfg

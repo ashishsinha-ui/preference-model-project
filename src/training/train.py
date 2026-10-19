@@ -13,9 +13,9 @@ import yaml
 from transformers import AutoTokenizer
 from transformers.utils import logging as hf_logging
 
-from src.data.dataset import CrossCollator, PairDataset, load_split
+from src.data.dataset import PairDataset, load_split
 from src.evaluation.evaluate import evaluate_model
-from src.models.cross_encoder import CrossEncoderModel
+from src.models.cross_encoder import build_model
 from src.training.trainer import make_predict_fn, train
 from src.utils import tracking
 from src.utils.seed import set_seed
@@ -66,8 +66,8 @@ def main():
     train_ds = PairDataset(load_split(cfg["dataset"], "train", cfg["subset_size"], cfg["seed"]), tok,
                            cfg["label_type"], swap_prob=cfg["swap_prob"], **ds_kw)
     val_ds = PairDataset(load_split(cfg["dataset"], "val"), tok, cfg["label_type"], **ds_kw)
-    model = CrossEncoderModel(cfg["model_name"], cfg["dropout"], cfg["gradient_checkpointing"])
-    collate = CrossCollator(tok, token_type=model.use_token_type)
+    model = build_model(cfg)  # cfg["arch"]: cross (default) or bi
+    collate = model.make_collator(tok)
 
     n_params = sum(p.numel() for p in model.parameters())
     print(f"{name}: {n_params / 1e6:.0f}M params | train={len(train_ds)} val={len(val_ds)}")

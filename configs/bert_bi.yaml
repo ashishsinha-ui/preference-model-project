@@ -1,0 +1,23 @@
+# T5 — BERT-base bi-encoder: each response scored separately, P(A) = sigmoid(s(A) - s(B))
+tier: t5
+short_name: bert-bi
+arch: bi                 # bi-encoder (src/models/bi_encoder.py); cross-encoder configs omit this key
+model_name: bert-base-uncased
+dataset: hh              # hh | shp
+label_type: hard         # hard | soft
+subset_size: null
+swap_prob: 0.0           # irrelevant for a bi-encoder (already position-invariant)
+max_prompt: 128
+epochs: 3
+batch_size: 32
+grad_accum: 1
+eval_batch_size: 128
+lr: 2.0e-5
+weight_decay: 0.01
+warmup_ratio: 0.1
+dropout: 0.1
+eval_every: 1000
+patience: 3
+bf16: true
+gradient_checkpointing: false
+seed: 42

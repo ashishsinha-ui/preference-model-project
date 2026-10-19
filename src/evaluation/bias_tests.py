@@ -22,7 +22,7 @@ import pandas as pd
 import torch
 from tqdm import tqdm
 
-from src.data.dataset import CrossCollator, load_split
+from src.data.dataset import load_split
 from src.evaluation.evaluate import swap
 from src.utils import tracking
 from src.utils.seed import SEED
@@ -99,7 +99,7 @@ def evaluate_run(run, df, track=True):
     from src.models.cross_encoder import load_checkpoint
     from src.training.trainer import make_predict_fn
     model, tok, cfg = load_checkpoint(f"checkpoints/{run}")
-    collate = CrossCollator(tok, token_type=model.use_token_type)
+    collate = model.make_collator(tok)
     predict = make_predict_fn(model, tok, collate, batch_size=cfg["eval_batch_size"], bf16=cfg["bf16"],
                               max_prompt=cfg["max_prompt"], max_resp=MAX_RESP)
     p, p_swp = predict(df), predict(swap(df))

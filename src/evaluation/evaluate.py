@@ -48,12 +48,13 @@ def evaluate_set(df, p, p_swp):
     return out
 
 
-def evaluate_model(predict_fn, run_name, sets=tuple(EVAL_SETS), out_dir="results"):
+def evaluate_model(predict_fn, run_name, sets=tuple(EVAL_SETS), out_dir="results", max_n=None):
+    """max_n: evaluate on a fixed random subsample of each set (used by the slow LLM judge)."""
     out = Path(out_dir) / run_name
     out.mkdir(parents=True, exist_ok=True)
     results = {}
     for name in sets:
-        df = load_split(*EVAL_SETS[name])
+        df = load_split(*EVAL_SETS[name], subset_size=max_n)
         p = np.asarray(predict_fn(df), float)
         p_swp = np.asarray(predict_fn(swap(df)), float)
         pd.DataFrame({"uid": df.uid, "p_a": p, "p_a_swapped": p_swp}).to_parquet(
