@@ -59,7 +59,7 @@ def main():
     ckpt_dir.mkdir(parents=True, exist_ok=True)
     with open(ckpt_dir / "config.yaml", "w") as f:
         yaml.safe_dump(cfg, f)
-    tracking.start_run(name, cfg, enabled=not args.no_track)
+    tracking.start_run(name, cfg, ai_label=cfg["dataset"] == "uf", enabled=not args.no_track)
 
     tok = AutoTokenizer.from_pretrained(cfg["model_name"])
     ds_kw = dict(max_prompt=cfg["max_prompt"], max_resp=MAX_RESP)

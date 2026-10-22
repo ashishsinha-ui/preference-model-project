@@ -21,6 +21,10 @@ EVAL_SETS = {  # name -> (dataset, split)
     "hh_harmless": ("hh", "harmless_shift"),
     "shp_val": ("shp", "val_full"),
     "shp_test": ("shp", "test"),
+    "hhh_val": ("hhh", "val"),      # harmless split for the reverse domain-shift experiment
+    "hhh_test": ("hhh", "test"),
+    "uf_val": ("uf", "val"),        # UltraFeedback (GPT-4 labels), [AI-Label] ablation
+    "uf_test": ("uf", "test"),
 }
 
 
@@ -67,6 +71,8 @@ def evaluate_model(predict_fn, run_name, sets=tuple(EVAL_SETS), out_dir="results
               f"brier={res['brier']:.4f} ece={res['ece']:.4f} swap_cons={res['swap_consistency']:.3f} "
               f"pos_bias={res['position_bias']:+.3f} len_r={res['length_r_model']:+.3f} "
               f"(human {res['length_r_human']:+.3f})")
+    if (out / "metrics.json").exists():  # merge, so evaluating extra sets never drops old ones
+        results = {**json.load(open(out / "metrics.json")), **results}
     with open(out / "metrics.json", "w") as f:
         json.dump(results, f, indent=2)
     tracking.log_file(out / "metrics.json")
