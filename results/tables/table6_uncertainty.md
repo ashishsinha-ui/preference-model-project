@@ -1,0 +1,8 @@
+| model / method                 |   AUROC errors (spread) |   AUROC disagreement (spread) |   AUROC disagreement (|p-0.5|) |   disagreement rate in 0.4-0.6 band |   base rate |
+|:-------------------------------|------------------------:|------------------------------:|-------------------------------:|------------------------------------:|------------:|
+| BERT hard, MC dropout          |                   0.506 |                         0.503 |                          0.508 |                               0.211 |       0.203 |
+| BERT hard, 3-seed ensemble     |                   0.506 |                         0.513 |                          0.507 |                               0.21  |       0.203 |
+| DeBERTa hard, MC dropout       |                   0.502 |                         0.499 |                          0.509 |                               0.213 |       0.203 |
+| DeBERTa hard, 3-seed ensemble  |                   0.52  |                         0.496 |                          0.499 |                               0.204 |       0.203 |
+| BERT soft (SHP), MC dropout    |                   0.621 |                         0.523 |                          0.539 |                               0.222 |       0.203 |
+| DeBERTa soft (SHP), MC dropout |                   0.618 |                         0.521 |                          0.534 |                               0.22  |       0.203 |
