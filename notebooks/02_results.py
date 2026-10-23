@@ -304,4 +304,23 @@ if Path("results/significance.csv").exists():
     (TAB / "table7_significance.md").write_text(
         sig[["question", "metric", "A", "B", "diff", "ci_low", "ci_high", "p", "n", "winner"]].round(4).to_markdown(index=False))
     print(sig[["question", "metric", "diff", "p", "winner"]].round(4).to_string(index=False))
+
+# %% [markdown]
+# ## Table 8 — Transfer matrix: training data (rows) x test set (columns), BERT cross-encoder, accuracy
+# Covers the reverse domain shift (harmless-trained) and the [AI-Label] ablation (UltraFeedback-trained).
+
+# %%
+TRANSFER = [("HH helpful (human)", "t2_bert_hard_hh_seed42"), ("HH harmless (human)", "t2_bert_hard_hhh_seed42"),
+            ("SHP (human, soft)", "t2_bert_soft_shp_seed42"), ("UltraFeedback (GPT-4, hard) [AI-Label]", "t2_bert_hard_uf_seed42"),
+            ("UltraFeedback (GPT-4, soft) [AI-Label]", "t2_bert_soft_uf_seed42")]
+TEST_COLS = {"hh_test": "HH helpful", "hhh_test": "HH harmless", "shp_test": "SHP", "uf_test": "UltraFeedback"}
+rows = []
+for label, run in TRANSFER:
+    m = load(run)
+    if m:
+        rows.append({"trained on": label, **{col: m.get(s, {}).get("accuracy", np.nan) for s, col in TEST_COLS.items()}})
+t8 = pd.DataFrame(rows)
+t8.to_csv(TAB / "table8_transfer.csv", index=False)
+(TAB / "table8_transfer.md").write_text(t8.round(3).to_markdown(index=False))
+print(t8.round(3).to_string(index=False))
 print(f"\nTables -> {TAB}/   Figures -> {FIG}/")
