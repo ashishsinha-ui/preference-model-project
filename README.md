@@ -8,6 +8,8 @@ on human preference data and test them for **position bias**, **length (verbosit
 
 Author: Ashish Sinha, IIT Bhilai · NLP / LLM alignment course project, 2026
 
+**Report:** [`report/report.pdf`](report/report.pdf) (ACL format; LaTeX source in [`report/`](report/)).
+
 ---
 
 ## Key results

@@ -9,3 +9,9 @@ __pycache__/
 results/**/preds_*.parquet
 .venv/
 *.out
+report/*.log
+report/*.aux
+report/*.blg
+report/*.bbl
+report/*.out
+*.zip

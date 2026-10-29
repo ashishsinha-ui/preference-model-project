@@ -44,6 +44,44 @@ plt.rcParams.update({
     "lines.linewidth": 2, "lines.markersize": 8})
 
 
+# PAPER=1 -> print-size figures for the ACL report (report/figures): drawn at final width
+# (3.1 in single column, 6.3 in double column) with 7 pt text and no headline titles (captions carry them).
+PAPER = os.environ.get("PAPER") == "1"
+SMALL, LEG_Y = 8, -0.16
+if PAPER:
+    FIG = Path("report/figures")
+    FIG.mkdir(parents=True, exist_ok=True)
+    SMALL, LEG_Y = 6, -0.30
+    C["surface"] = "#ffffff"  # printed page is white
+    plt.rcParams.update({"font.size": 7, "axes.titlesize": 7.5, "lines.linewidth": 1.5, "lines.markersize": 5,
+                         "grid.linewidth": 0.4, "axes.linewidth": 0.6, "legend.fontsize": 6,
+                         "figure.facecolor": "#ffffff", "axes.facecolor": "#ffffff", "savefig.facecolor": "#ffffff"})
+
+
+def fs(w, h):
+    """Figure size: screen size, or scaled to print width in PAPER mode."""
+    if not PAPER:
+        return (w, h)
+    scale = 3.1 / 7.5 if w <= 7.5 else 6.3 / 9
+    return (w * scale, h * scale * 1.2)
+
+
+SHORT = {"T0 length only": "Length only", "T0 TF-IDF + LR": "TF-IDF", "T1 BiLSTM cross": "BiLSTM cross",
+         "T1 BiLSTM siamese": "BiLSTM siamese", "T2 BERT cross": "BERT", "T2 BERT cross, 3-seed ens.": "BERT ens.",
+         "T5 BERT bi-encoder": "BERT bi-encoder", "T3 DeBERTa cross": "DeBERTa", "T3 DeBERTa cross, 3-seed ens.": "DeBERTa ens.",
+         "T6 LLaMA-3-8B judge (3-shot)": "LLaMA-3 judge"}
+
+
+def lab(name):
+    """Model label: full on screen, short in the print-size paper figures."""
+    return SHORT.get(name, name) if PAPER else name
+
+
+def headline(ax, text):
+    if not PAPER:
+        ax.set_title(text)
+
+
 def save(fig, name):
     fig.tight_layout()
     for ext in ("png", "pdf"):
@@ -56,11 +94,11 @@ def ref_line(ax, x, text, n):
     """Dashed reference line with its label tucked under the last row (never over data)."""
     ax.axvline(x, color=C["muted"], linestyle="--", linewidth=1)
     ax.set_ylim(-0.9, n - 0.5)
-    ax.text(x, -0.75, f" {text}", color=C["muted"], fontsize=8, va="center")
+    ax.text(x, -0.75, f" {text}", color=C["muted"], fontsize=SMALL, va="center")
 
 
 def legend_below(ax, ncol=2):
-    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.16), ncol=ncol, fontsize=8)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, LEG_Y), ncol=ncol, fontsize=SMALL)
 
 
 def load(run, kind="metrics"):
@@ -141,43 +179,46 @@ print(t2.round(3).to_string(index=False))
 
 # %%
 d = t1.iloc[::-1].reset_index(drop=True)
-fig, ax = plt.subplots(figsize=(7.5, 0.42 * len(d) + 1.2))
+fig, ax = plt.subplots(figsize=fs(7.5, 0.42 * len(d) + 1.2))
 y = np.arange(len(d))
 ax.hlines(y, d.acc_ci_low, d.acc_ci_high, color=C["b250"], linewidth=2, zorder=2)
 ax.plot(d.acc, y, "o", color=C["s1"], label="raw prediction", zorder=3)
 has_sym = d.acc_symmetrized.notna()
-ax.plot(d.acc_symmetrized[has_sym], y[has_sym], "D", color=C["s2"], markersize=7,
+ax.plot(d.acc_symmetrized[has_sym], y[has_sym], "D", color=C["s2"], markersize=plt.rcParams["lines.markersize"] * 0.9,
         markeredgecolor=C["surface"], markeredgewidth=1.5, label="symmetrized (avg. of both A/B orders)", zorder=4)
 ref_line(ax, 0.5, "chance", len(d))
-ax.set_yticks(y, [f"{m}  (n={int(n):,})" if n != 6194 else m for m, n in zip(d.model, d.n)])
-ax.set_xlabel("HH helpful test accuracy (bars: 95% bootstrap CI)")
+ax.set_yticks(y, [f"{lab(m)}  (n={int(n):,})" if n != 6194 else lab(m) for m, n in zip(d.model, d.n)])
+ax.set_xlabel("HH test accuracy (95% CI)" if PAPER else "HH helpful test accuracy (bars: 95% bootstrap CI)")
 ax.set_xlim(0.48, 0.72)
 ax.grid(axis="y", visible=False)
-legend_below(ax)
-ax.set_title("Accuracy rises with model tier; averaging both orders adds ~1 point")
+legend_below(ax, ncol=1 if PAPER else 2)
+headline(ax, "Accuracy rises with model tier; averaging both orders adds ~1 point")
 save(fig, "fig1_accuracy_ladder")
 
 # %% [markdown]
 # ## Figure 2 — Position bias: swap consistency (share of pairs whose decision flips when A/B swap)
 
 # %%
-fig, ax = plt.subplots(figsize=(7.5, 0.42 * len(d) + 1.2))
+fig, ax = plt.subplots(figsize=fs(7.5, 0.42 * len(d) + 1.2))
 ax.barh(y, d.swap_consistency, height=0.55, color=C["s1"], zorder=2)
 for yi, v in zip(y, d.swap_consistency):
-    ax.text(v + 0.005, yi, f"{v:.2f}", va="center", fontsize=8, color=C["ink2"])
-ref_line(ax, 0.95, "plan target 0.95", len(d))
-ax.set_yticks(y, d.model)
+    if PAPER:  # value inside the bar end, clear of the target line
+        ax.text(v - 0.02, yi, f"{v:.2f}", va="center", ha="right", fontsize=SMALL, color=C["surface"])
+    else:
+        ax.text(v + 0.005, yi, f"{v:.2f}", va="center", fontsize=SMALL, color=C["ink2"])
+ref_line(ax, 0.95, "target 0.95" if PAPER else "plan target 0.95", len(d))
+ax.set_yticks(y, [lab(m) for m in d.model])
 ax.set_xlim(0, 1.08)
-ax.set_xlabel("swap consistency on HH test (1.0 = never depends on order)")
+ax.set_xlabel("swap consistency on HH test" if PAPER else "swap consistency on HH test (1.0 = never depends on order)")
 ax.grid(axis="y", visible=False)
-ax.set_title("Cross-encoders and the LLM judge depend on response order")
+headline(ax, "Cross-encoders and the LLM judge depend on response order")
 save(fig, "fig2_swap_consistency")
 
 # %% [markdown]
 # ## Figure 3 — Reliability diagrams on SHP test: hard vs hard + temperature scaling vs soft labels
 
 # %%
-fig, axes = plt.subplots(1, 2, figsize=(9, 4.2), sharey=True)
+fig, axes = plt.subplots(1, 2, figsize=fs(9, 4.2), sharey=True)
 for ax, (tier, prefix) in zip(axes, SHP_PAIRS[1:]):
     hard_dir, soft_dir = Path(f"results/{prefix}_hard_shp_seed42"), Path(f"results/{prefix}_soft_shp_seed42")
     hard, soft = load_preds(hard_dir, "shp_test"), load_preds(soft_dir, "shp_test")
@@ -191,22 +232,23 @@ for ax, (tier, prefix) in zip(axes, SHP_PAIRS[1:]):
         b = reliability_bins(np.asarray(p), np.asarray(yv))
         conf, acc, cnt = map(np.array, zip(*[r for r in b if r[2] >= 30]))  # bins with >= 30 pairs
         ece = sum(c / sum(x[2] for x in b) * abs(cf - a) for cf, a, c in b)
-        ax.plot(conf, acc, "-o", color=col, markersize=6, label=f"{name}  ECE {ece:.3f}")
+        ax.plot(conf, acc, "-o", color=col, markersize=plt.rcParams["lines.markersize"] * 0.75, label=f"{name}  ECE {ece:.3f}")
     ax.set_title(f"{tier} (SHP test)")
     ax.set_xlabel("model confidence in its predicted winner")
     ax.set_xlim(0.5, 1)
     ax.set_ylim(0.4, 1)
-    ax.legend(loc="upper left", fontsize=8)
+    ax.legend(loc="lower right", fontsize=SMALL)
 axes[0].set_ylabel("observed accuracy")
-fig.suptitle("Hard labels are overconfident; temperature scaling and soft labels both repair it",
-             fontsize=11, fontweight="bold", color=C["ink"])
+if not PAPER:
+    fig.suptitle("Hard labels are overconfident; temperature scaling and soft labels both repair it",
+                 fontsize=11, fontweight="bold", color=C["ink"])
 save(fig, "fig3_reliability_shp")
 
 # %% [markdown]
 # ## Figure 4 — RQ3: distance to the human vote distribution (KL), hard → soft labels
 
 # %%
-fig, axes = plt.subplots(1, 2, figsize=(9, 3.2))
+fig, axes = plt.subplots(1, 2, figsize=fs(9, 3.2))
 for ax, (metric, title) in zip(axes, [("kl_to_human", "KL to human vote share (all pairs)"),
                                       ("kl_high_disagreement", "KL on high-disagreement pairs")]):
     sub = t2[t2.labels.isin(["hard", "soft"])].pivot(index="model", columns="labels", values=metric)
@@ -216,15 +258,15 @@ for ax, (metric, title) in zip(axes, [("kl_to_human", "KL to human vote share (a
     ax.plot(sub.hard, yy, "o", color=C["b250"], label="hard labels", zorder=2)
     ax.plot(sub.soft, yy, "o", color=C["b550"], label="soft labels", zorder=3)
     for yi, (h, s) in zip(yy, zip(sub.hard, sub.soft)):
-        ax.text(s, yi - 0.2, f"{s:.2f}", ha="center", va="top", fontsize=8, color=C["ink2"])
-        ax.text(h, yi - 0.2, f"{h:.2f}", ha="center", va="top", fontsize=8, color=C["ink2"])
+        ax.text(s, yi - 0.2, f"{s:.2f}", ha="center", va="top", fontsize=SMALL, color=C["ink2"])
+        ax.text(h, yi - 0.2, f"{h:.2f}", ha="center", va="top", fontsize=SMALL, color=C["ink2"])
     ax.set_yticks(yy, sub.index)
     ax.set_ylim(-0.6, len(sub) - 0.5)
     ax.set_xlim(0, sub.values.max() * 1.12)
     ax.set_xlabel("KL divergence (lower = closer to humans)")
     ax.set_title(title)
     ax.grid(axis="y", visible=False)
-fig.legend(*axes[0].get_legend_handles_labels(), loc="lower center", ncol=2, fontsize=8,
+fig.legend(*axes[0].get_legend_handles_labels(), loc="lower center", ncol=2, fontsize=SMALL,
            bbox_to_anchor=(0.5, -0.04))
 save(fig, "fig4_rq3_kl_hard_vs_soft")
 
@@ -244,17 +286,17 @@ for label, run in [("BERT cross", "t2_bert_hard_hh_seed42"), ("BERT cross + swap
 t5 = pd.DataFrame(rows)
 t5.to_csv(TAB / "table5_test_b_length.csv", index=False)
 d5 = t5.iloc[::-1].reset_index(drop=True)
-fig, ax = plt.subplots(figsize=(7.5, 3.4))
+fig, ax = plt.subplots(figsize=fs(7.5, 3.4))
 yy = np.arange(len(d5))
 ax.barh(yy, d5.p_prefers_longer_same_content, height=0.55, color=C["s1"], zorder=2)
 for yi, v in zip(yy, d5.p_prefers_longer_same_content):
-    ax.text(v + 0.01, yi, f"{v:.0%}", va="center", fontsize=8, color=C["ink2"])
+    ax.text(v + 0.01, yi, f"{v:.0%}", va="center", fontsize=SMALL, color=C["ink2"])
 ref_line(ax, 0.5, "no length preference", len(d5))
 ax.set_yticks(yy, d5.model)
 ax.set_xlim(0, 1)
-ax.set_xlabel("share of same-content pairs where the model picks the longer version")
+ax.set_xlabel("picks the longer same-content version" if PAPER else "share of same-content pairs where the model picks the longer version")
 ax.grid(axis="y", visible=False)
-ax.set_title("Every architecture prefers the longer version of the same answer")
+headline(ax, "Every architecture prefers the longer version of the same answer")
 save(fig, "fig5_length_bias_test_b")
 
 # %% [markdown]
@@ -262,18 +304,18 @@ save(fig, "fig5_length_bias_test_b")
 
 # %%
 d6 = t1.dropna(subset=["harmless_acc"]).iloc[::-1].reset_index(drop=True)
-fig, ax = plt.subplots(figsize=(7.5, 0.42 * len(d6) + 1.2))
+fig, ax = plt.subplots(figsize=fs(7.5, 0.42 * len(d6) + 1.2))
 yy = np.arange(len(d6))
 ax.hlines(yy, d6.harmless_acc, d6.acc, color=C["axis"], linewidth=2, zorder=1)
 ax.plot(d6.acc, yy, "o", color=C["b550"], label="helpful test (in domain)", zorder=3)
 ax.plot(d6.harmless_acc, yy, "o", color=C["b250"], label="harmless (out of domain)", zorder=2)
 ref_line(ax, 0.5, "chance", len(d6))
-ax.set_yticks(yy, d6.model)
+ax.set_yticks(yy, [lab(m) for m in d6.model])
 ax.set_xlim(0.3, 0.72)
 ax.set_xlabel("accuracy")
 ax.grid(axis="y", visible=False)
-legend_below(ax)
-ax.set_title("Helpful-trained models fall below chance on harmless prompts")
+legend_below(ax, ncol=1 if PAPER else 2)
+headline(ax, "Helpful-trained models fall below chance on harmless prompts")
 save(fig, "fig6_domain_shift")
 
 # %% [markdown]
