@@ -18,6 +18,7 @@ scipy
 seaborn
 sentencepiece
 streamlit
+tabulate
 tiktoken
 torch>=2.4
 tqdm
